@@ -17,6 +17,7 @@ import {
 } from "../../lib/index";
 import { expectNoAxeViolations } from "../support/axe";
 import { nextFrame } from "../support/next-frame";
+import { silenceRenderErrors } from "../support/silence-render-errors";
 
 const schema = z
   .object({
@@ -376,7 +377,7 @@ describe("a headless form", () => {
       useFormContext();
       return null;
     };
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    silenceRenderErrors();
     expect(() => render(<Orphan />)).toThrow(
       "useFormContext() must be called inside a <Form>"
     );
