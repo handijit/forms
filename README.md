@@ -49,7 +49,7 @@ of [`@handijit/ui`](https://www.npmjs.com/package/@handijit/ui) 2.
 | -------------- | -------- | ----------------------------------------- |
 | `react`        | `>=18`   | everything                                |
 | `zod`          | `^4.0.0` | everything (classic `zod` and `zod/mini`) |
-| `@handijit/ui` | `^2.0.0` | `@handijit/forms/ui` only (optional)      |
+| `@handijit/ui` | `^2.2.0` | `@handijit/forms/ui` only (optional)      |
 | `@handijit/tr` | `^1.0.0` | `@handijit/forms/tr` only (optional)      |
 
 The build targets ES2022: Electron 43+, and evergreen browsers for the site and the panel. The
@@ -221,13 +221,30 @@ Every binder takes `name`, `label`, `hint`, `isRequired` (default: from the sche
 `requiredLabel`, `isLabelHidden`, `className` (on ui's `Field`), an optional `form` (default: the
 nearest `<Form>`) and an optional `validate`, plus the props of the ui component it renders.
 
+- **The control gets the field's id** and ui's links (`aria-invalid`, `aria-describedby` with the
+  error and the hint, `required`), on the element a screen reader stops at: the number box of
+  `QuantityField`, the thumbs of `RangeSliderField`, both date fields of `DateRangeField`, the
+  group of `SegmentedField`, `ChipGroupField`, `RatingField` and the radio groups. The error
+  summary links there and the form focuses it on an error.
+- **A rich label**: `TextField`, `NumberField`, `TextareaField`, `PasswordField`, `DateField`,
+  `ComboboxField`, `CheckboxField` and `SwitchField` take a `ReactNode` `label`; give
+  `summaryLabel` for the error summary when it is not plain text. The other binders also use the
+  label as the control's accessible name and take text.
+- **`<Form isReadOnly>`** makes `SelectField`, `ComboboxField`, `QuantityField`, `SegmentedField`,
+  `ChipGroupField`, `RangeSliderField`, `RatingField`, `DateRangeField` and `TagInputField`
+  read-only (focusable and readable, not editable; ui's `isReadOnly`). Checkboxes, switches,
+  radios and file uploads have no read-only state in ui and are disabled instead. Every binder
+  also takes its own `isDisabled` / `isReadOnly` (or `disabled` / `readOnly`).
+- **Blur**: a select or combobox is left when focus leaves it, not when a choice is made; a
+  composite (several focusable parts) when focus leaves the whole group.
+
 | Binder                | ui component             | Value                                             |
 | --------------------- | ------------------------ | ------------------------------------------------- |
 | `TextField`           | `Input` (+ `format`)     | `string` (or the format's)                        |
 | `NumberField`         | `Input` + `numberFormat` | `number \| undefined`                             |
 | `TextareaField`       | `Textarea`               | `string`                                          |
 | `PasswordField`       | `PasswordInput`          | `string`                                          |
-| `SelectField`         | `Select`                 | `string`                                          |
+| `SelectField`         | `Select`                 | `string` (empty: `null`, `undefined` or `""`)     |
 | `ComboboxField`       | `Combobox`               | `string \| null`                                  |
 | `CheckboxField`       | `Checkbox`               | `boolean`                                         |
 | `SwitchField`         | `Switch`                 | `boolean`                                         |
