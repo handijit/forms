@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 
 // The exact file list of the tarball: a file that is missing breaks a consumer, a file that
-// was not meant to ship (sources, tests, the fixture app) is a leak.
-const ENTRIES = ["index", "main", "preload", "renderer"];
+// was not meant to ship (sources, tests, the React 18 workspace, the browser sample) is a leak.
+const ENTRIES = ["index", "ui", "tr"];
 const EXTENSIONS = ["cjs", "cjs.map", "d.mts", "d.ts", "mjs", "mjs.map"];
 const expected = [
   "package/CHANGELOG.md",

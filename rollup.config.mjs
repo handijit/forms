@@ -37,6 +37,9 @@ export default Object.entries(ENTRIES).flatMap(([entry, { isClient }]) => {
           file: `./build/${entry}.cjs`,
           format: "cjs",
           exports: "named",
+          // ui's CommonJS files carry `__esModule` and `exports.default`: honour that marker
+          // instead of treating the whole `require()` result as the default export.
+          interop: "auto",
           sourcemap: true,
           banner,
         },
