@@ -1,0 +1,33 @@
+/* Layout of the sample page only, in ui's tokens; the fields look entirely ui's. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--hd-bg-page);
+  color: var(--hd-text);
+  font-family: var(--hd-font-body);
+}
+
+.sample {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--hd-space-6) var(--hd-space-4);
+}
+
+.sample h1 {
+  font-family: var(--hd-font-display);
+  margin: 0 0 var(--hd-space-4);
+}
+
+.sample form {
+  display: grid;
+  gap: var(--hd-space-4);
+}
+
+.sample__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--hd-space-4);
+}
