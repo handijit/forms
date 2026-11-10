@@ -1,7 +1,7 @@
 {
-  // @handijit/ui 2.0.0 ships declarations with extensionless relative imports, which Node's
-  // ES module resolution rejects inside the ui package itself. No declaration file is checked
-  // in this pass (the consumer code still is); the bundler pass checks every declaration.
+  // Node's own resolution, both module systems. `skipLibCheck` is off: since @handijit/ui 2.2 its
+  // declarations resolve under `nodenext` too (ESM and CommonJS), so every declaration file of
+  // the consumer's tree is checked here as in the bundler pass.
   "compilerOptions": {
     "target": "es2023",
     "module": "nodenext",
@@ -10,7 +10,7 @@
     "types": [],
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": false
   },
   "files": ["consumer.ts", "consumer.mts"]
 }

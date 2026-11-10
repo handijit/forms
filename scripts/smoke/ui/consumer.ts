@@ -35,5 +35,9 @@ export const SignUp = (): ReactElement => {
   );
 };
 
+// ui's props resolve under every resolution (ui 2.2): an unknown prop must not compile.
+// @ts-expect-error `isLoadingg` is not a prop of SubmitButton (ui's Button)
+export const typo = createElement(SubmitButton, { isLoadingg: true });
+
 // @ts-expect-error a name that is not a path of the form must not compile
 export const wrong: TextFieldProps<Values>["name"] = "e-mail";

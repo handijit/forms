@@ -39,5 +39,5 @@ run_consumer() {
 }
 
 run_consumer headless
-run_consumer ui "@handijit/ui@^2" "@handijit/utils@^2" "@handijit/design@^1" \
+run_consumer ui "@handijit/ui@^2.2" "@handijit/utils@^2" "@handijit/design@^1.1" \
   "react-bootstrap-icons@^1.11" "@handijit/tr@^1"
