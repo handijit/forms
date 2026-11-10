@@ -1,6 +1,6 @@
 {
   "name": "@handijit/forms",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Zod-based client forms for React: a typed, headless form store with field-level subscriptions, accessible error handling and ready binders for the @handijit/ui field components.",
   "author": "Ahmet ilhan <ahmetilhan.dev@gmail.com>",
   "license": "MIT",

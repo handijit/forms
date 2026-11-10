@@ -7,6 +7,48 @@ and the package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-10
+
+Moves to `@handijit/ui` 2.2, which closes the gaps the 1.0 binders worked around: the controls now
+carry their own errors, links and read-only state.
+
+### Changed
+
+- **Requires `@handijit/ui` `^2.2.0`** for `@handijit/forms/ui` (was `^2.0.0`).
+- **`<Form isReadOnly>` makes the composites read-only instead of disabled**: `SelectField`,
+  `ComboboxField`, `QuantityField`, `SegmentedField`, `ChipGroupField`, `RangeSliderField`,
+  `RatingField`, `DateRangeField` and `TagInputField` stay focusable and readable
+  (`aria-readonly` / native `readOnly`). Checkboxes, switches, radios and file uploads are still
+  disabled: ui has no read-only state for them.
+- **`SelectField` and `ComboboxField` are touched when focus leaves them**, through ui's new
+  `onBlur`, not when a choice is made. A field validator runs on that blur.
+- **`CheckboxField` and `SwitchField` render the control alone**: ui's `Checkbox` / `Switch` draw
+  the error under their label (ui 2.2 `error`). The ui `Field` around them, with an empty hidden
+  label, is gone; `className` lands on the control's root (its `<label>`), not on a wrapper.
+- **The control takes the field's id** (`useField`'s `id`), so the ids are the form's in every
+  binder; ui's `Field` gets it through its new `id` prop.
+
+### Added
+
+- `SegmentedField` and `ChipGroupField` follow `<Form isDisabled>` and take their own
+  `isDisabled` / `isReadOnly` (ui 2.2's group-wide states; in 1.0 a disabled form left them
+  enabled).
+- A `ReactNode` `label` with `summaryLabel` on `TextField`, `NumberField`, `TextareaField`,
+  `PasswordField`, `DateField` and `ComboboxField` (ui 2.2 `Field` takes a rich label).
+- `NamedBinderProps` and `NamedFieldFrameProps`: the props of a binder whose control is named by
+  the label text.
+
+### Fixed
+
+- **The composites link their error to the control a screen reader stops at.** In 1.0 the error
+  and hint ids sat on a wrapper `<div>` (or nowhere) because ui's composites took no `id` /
+  `aria-*`; now the number box, the slider thumbs, the date fields, the radio groups and the
+  rating's fieldset carry `aria-invalid` and `aria-describedby` themselves.
+- **A checkbox's or switch's hint is linked once.** 1.0 passed the hint id next to the error id
+  to work around ui replacing the hint; ui 2.2 merges the links.
+- **The `nodenext` smoke test checks ui's declarations** (`skipLibCheck` off): ui 2.2 resolves
+  under Node's own resolution, ES modules and CommonJS.
+
 ## [1.0.0] - 2026-11-10
 
 First release: Zod-based client forms for React, in three entry points (`.`, `./ui`, `./tr`), as
