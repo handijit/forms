@@ -195,7 +195,7 @@ describe("createFormStore: validation timing", () => {
       schema: z.object({ a: z.string() }).refine(() => false, "Hep yanlış"),
       mode: "change",
     });
-    form.setValue("a", "x");
+    form.setValue("a" as never, "x" as never);
     expect(form.getState().formErrors).toEqual([]);
     await form.handleSubmit();
     expect(form.getState().formErrors).toEqual(["Hep yanlış"]);
@@ -320,11 +320,11 @@ describe("createFormStore: field validators", () => {
     expect(form.getState().errors.email).toBe("Hayır");
   });
 
-  test("should drop a stale result and abort the older run", async () => {
+  test("should use the first registered validator of a field", async () => {
     const { form } = setup({ mode: "blur" });
     const signals: AbortSignal[] = [];
     const resolvers: ((message: string | undefined) => void)[] = [];
-    registerValidator(form, (_value: unknown) => undefined);
+    registerValidator(form, () => undefined);
     form.registerField("email", {
       getElement: () => null,
       validate: ((_value: unknown, context: { signal: AbortSignal }) => {
@@ -545,8 +545,10 @@ describe("createFormStore: submit", () => {
   test("should not count a submit with server errors as successful", async () => {
     const { form } = setup(
       {
-        onSubmit: ((_values: never, helpers: { setFormError: (m: string) => void }) =>
-          helpers.setFormError("Sunucu reddetti")) as never,
+        onSubmit: ((
+          _values: never,
+          helpers: { setFormError: (m: string) => void }
+        ) => helpers.setFormError("Sunucu reddetti")) as never,
       },
       valid
     );
@@ -617,7 +619,11 @@ describe("createFormStore: errors from outside", () => {
 
   test("should fall back to title, then to the default text", () => {
     const form = withFields();
-    form.applyServerErrors({ status: 400, title: "Bad Request", fields: ["email"] });
+    form.applyServerErrors({
+      status: 400,
+      title: "Bad Request",
+      fields: ["email"],
+    });
     expect(form.getState().errors.email).toBe("Bad Request");
     form.applyServerErrors({ status: 400, fields: ["name"] });
     expect(form.getState().errors.name).toBe("Bu alanı kontrol edin.");
@@ -627,7 +633,11 @@ describe("createFormStore: errors from outside", () => {
     const form = withFields();
     form.applyServerErrors({ status: 409, detail: "Bu kayıt değişti." });
     expect(form.getState().formErrors).toEqual(["Bu kayıt değişti."]);
-    form.applyServerErrors({ status: 500, detail: "Bu kayıt değişti.", fields: [] });
+    form.applyServerErrors({
+      status: 500,
+      detail: "Bu kayıt değişti.",
+      fields: [],
+    });
     expect(form.getState().formErrors).toEqual(["Bu kayıt değişti."]);
   });
 
@@ -650,7 +660,10 @@ describe("createFormStore: errors from outside", () => {
       unknown: "Görünmeyen alan",
     });
     expect(form.getState().errors).toEqual({ email: "Kayıtlı" });
-    expect(form.getState().formErrors).toEqual(["Form düzeyi", "Görünmeyen alan"]);
+    expect(form.getState().formErrors).toEqual([
+      "Form düzeyi",
+      "Görünmeyen alan",
+    ]);
     expect(form.getState().isSubmitSuccessful).toBe(false);
   });
 
@@ -667,7 +680,10 @@ describe("createFormStore: errors from outside", () => {
     form.setFormError("Form");
     form.setFormError("Form");
     form.setValue("name", "A");
-    expect(form.getState().errors).toEqual({ email: "Elle", name: "En az 2 harf" });
+    expect(form.getState().errors).toEqual({
+      email: "Elle",
+      name: "En az 2 harf",
+    });
     expect(form.getState().formErrors).toEqual(["Form"]);
     form.clearErrors("email");
     expect(form.getState().errors).toEqual({ name: "En az 2 harf" });
@@ -714,7 +730,10 @@ describe("createFormStore: reset", () => {
 
 describe("createFormStore: arrays", () => {
   test("should give each row a key that follows it", () => {
-    const { form } = setup({}, { ...defaults, items: [{ title: "a" }, { title: "b" }] });
+    const { form } = setup(
+      {},
+      { ...defaults, items: [{ title: "a" }, { title: "b" }] }
+    );
     const items = form.array("items");
     expect(form.array("items")).toBe(items);
     const [first, second] = form.getArrayKeys("items");
@@ -747,7 +766,10 @@ describe("createFormStore: arrays", () => {
   });
 
   test("should move touched state and errors with their rows", async () => {
-    const { form } = setup({}, { ...defaults, items: [{ title: "" }, { title: "ok" }] });
+    const { form } = setup(
+      {},
+      { ...defaults, items: [{ title: "" }, { title: "ok" }] }
+    );
     form.blur("items.1.title" as never);
     await form.handleSubmit();
     expect(form.getState().errors["items.0.title"]).toBe("Başlık gerekli");
@@ -761,11 +783,16 @@ describe("createFormStore: arrays", () => {
   });
 
   test("should move revealed paths with their rows in change mode", () => {
-    const { form } = setup({ mode: "change" }, { ...defaults, items: [{ title: "a" }, { title: "b" }] });
+    const { form } = setup(
+      { mode: "change" },
+      { ...defaults, items: [{ title: "a" }, { title: "b" }] }
+    );
     form.setValue("items.1.title" as never, "" as never);
     expect(form.getState().errors["items.1.title"]).toBe("Başlık gerekli");
     form.array("items").remove(0);
-    expect(form.getState().errors).toEqual({ "items.0.title": "Başlık gerekli" });
+    expect(form.getState().errors).toEqual({
+      "items.0.title": "Başlık gerekli",
+    });
   });
 
   test("should start keys for a missing array and renew them when the array is replaced", () => {

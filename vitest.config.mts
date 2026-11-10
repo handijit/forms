@@ -54,7 +54,12 @@ export default defineConfig({
       },
       {
         extends: true,
-        test: { name: "react-19", environment: "jsdom", include: DOM_TESTS },
+        test: {
+          name: "react-19",
+          environment: "jsdom",
+          include: DOM_TESTS,
+          env: { EXPECTED_REACT: "19" },
+        },
       },
       {
         extends: true,
@@ -63,6 +68,7 @@ export default defineConfig({
           name: "react-18",
           environment: "jsdom",
           include: DOM_TESTS,
+          env: { EXPECTED_REACT: "18" },
           server: {
             deps: {
               inline: [

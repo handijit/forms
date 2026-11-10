@@ -122,8 +122,6 @@ describe("isRequiredSchema", () => {
   });
 
   test("should not call an async field required", () => {
-    expect(
-      isRequiredSchema(z.string().refine(async () => false))
-    ).toBe(false);
+    expect(isRequiredSchema(z.string().refine(async () => false))).toBe(false);
   });
 });
