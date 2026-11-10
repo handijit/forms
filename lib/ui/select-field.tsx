@@ -3,7 +3,7 @@ import type { FieldPath, FieldValues } from "@handijit/forms";
 import Select from "@handijit/ui/select";
 
 import FieldFrame from "./field-frame";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 type SelectProps = ComponentProps<typeof Select<string>>;
@@ -11,7 +11,7 @@ type SelectProps = ComponentProps<typeof Select<string>>;
 export type SelectFieldProps<
   TValues = FieldValues,
   P extends FieldPath<TValues> = FieldPath<TValues>,
-> = FramedBinderProps<TValues, P> &
+> = NamedBinderProps<TValues, P> &
   Pick<
     SelectProps,
     | "options"
@@ -21,12 +21,13 @@ export type SelectFieldProps<
     | "size"
     | "align"
     | "isDisabled"
+    | "isReadOnly"
     | "testId"
   >;
 
 /**
  * ui's `Select` in a `Field`, bound to a form field. An empty value (`undefined`, `null`, `""`)
- * shows the placeholder. `Select` has no blur event: choosing marks the field touched.
+ * shows the placeholder. Leaving the select (not moving into its list) is the field's blur.
  */
 const SelectField = <
   TValues = FieldValues,
@@ -42,6 +43,7 @@ const SelectField = <
   isLabelHidden,
   className,
   isDisabled,
+  isReadOnly,
   ...selectProps
 }: SelectFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -61,12 +63,11 @@ const SelectField = <
           {...selectProps}
           {...a11y}
           label={label}
-          value={typeof field.value === "string" ? field.value : ""}
-          onChange={(value) => {
-            field.setValue(value);
-            field.onBlur();
-          }}
-          isDisabled={isDisabled ?? (bound.isDisabled || bound.isReadOnly)}
+          value={typeof field.value === "string" ? field.value : null}
+          onChange={(value) => field.setValue(value)}
+          onBlur={field.onBlur}
+          isDisabled={isDisabled ?? bound.isDisabled}
+          isReadOnly={isReadOnly ?? bound.isReadOnly}
         />
       )}
     </FieldFrame>

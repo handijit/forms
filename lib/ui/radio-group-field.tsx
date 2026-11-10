@@ -4,7 +4,7 @@ import Radio from "@handijit/ui/radio";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 export type RadioOption = {
@@ -18,7 +18,7 @@ export type RadioOption = {
 export type RadioGroupFieldProps<
   TValues = FieldValues,
   P extends FieldPath<TValues> = FieldPath<TValues>,
-> = FramedBinderProps<TValues, P> & {
+> = NamedBinderProps<TValues, P> & {
   options: readonly RadioOption[];
   isDisabled?: boolean;
   /** On the group element, for the layout of the radios. */

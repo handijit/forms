@@ -15,15 +15,22 @@ export type RatingFieldProps<
 > = BinderProps<TValues, P> &
   Omit<
     ComponentProps<typeof RatingInput>,
-    "value" | "onChange" | "className"
+    | "value"
+    | "onChange"
+    | "className"
+    | "id"
+    | "required"
+    | "aria-invalid"
+    | "aria-describedby"
   > & {
     /** On ui's `Field` wrapper. */
     className?: string;
   };
 
 /**
- * ui's `RatingInput` bound to a number field. The rating draws its own legend; ui's `Field`
- * (with an empty, hidden label) adds the error below it.
+ * ui's `RatingInput` bound to a number field. The rating draws its own legend and takes the
+ * field's links (ui 2.2); ui's `Field` (its label hidden: the legend is the visible one) adds the
+ * error below it.
  */
 const RatingField = <
   TValues = FieldValues,
@@ -35,6 +42,7 @@ const RatingField = <
   label,
   className,
   isDisabled,
+  isReadOnly,
   ...ratingProps
 }: RatingFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -46,19 +54,20 @@ const RatingField = <
     <FieldFrame
       bound={bound}
       name={name}
-      label=""
+      label={label}
       isLabelHidden
-      isRequired={false}
       {...(className === undefined ? {} : { className })}
     >
       {(a11y) => (
-        <FieldGroup a11y={a11y} onLeave={field.onBlur}>
+        <FieldGroup onLeave={field.onBlur}>
           <RatingInput
             {...ratingProps}
+            {...a11y}
             label={label}
             value={typeof field.value === "number" ? field.value : null}
             onChange={(value) => field.setValue(value)}
-            isDisabled={isDisabled ?? (bound.isDisabled || bound.isReadOnly)}
+            isDisabled={isDisabled ?? bound.isDisabled}
+            isReadOnly={isReadOnly ?? bound.isReadOnly}
           />
         </FieldGroup>
       )}

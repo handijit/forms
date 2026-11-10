@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 import { z } from "zod";
@@ -144,9 +144,16 @@ describe("the composite binders", () => {
       children: fields,
     });
     await user.click(screen.getByRole("button", { name: "Gönder" }));
+    // The group names the range; ui 2.2's DateRange marks and links both fields itself.
     const group = screen.getByRole("group", { name: "Dönem" });
-    expect(group.getAttribute("aria-invalid")).toBe("true");
-    expect(screen.getByText("Bitiş tarihini girin")).toBeTruthy();
+    for (const name of ["Başlangıç", "Bitiş"]) {
+      const field = within(group).getByLabelText(name);
+      expect(field.getAttribute("aria-invalid")).toBe("true");
+      expect(
+        document.getElementById(field.getAttribute("aria-describedby") ?? "")
+          ?.textContent
+      ).toContain("Bitiş tarihini girin");
+    }
   });
 
   test("should keep one file when not multiple, and disable from the form", async () => {
@@ -190,6 +197,51 @@ describe("the composite binders", () => {
     input.focus();
     input.blur();
     expect(form().getState().touched.files).toBe(true);
+  });
+
+  test("should link every composite's error to the control itself", async () => {
+    const user = userEvent.setup();
+    renderForm({ schema, defaultValues: defaults, children: fields });
+    await user.click(screen.getByRole("button", { name: "Gönder" }));
+    await nextFrame();
+    const described = (element: HTMLElement): string =>
+      (element.getAttribute("aria-describedby") ?? "")
+        .split(" ")
+        .map((id) => document.getElementById(id)?.textContent ?? "")
+        .join(" ");
+    const quantity = screen.getByRole("spinbutton", { name: "Adet" });
+    expect(quantity.getAttribute("aria-invalid")).toBe("true");
+    expect(described(quantity)).toContain("En az 2 adet");
+    for (const thumb of screen.getAllByRole("slider")) {
+      expect(thumb.getAttribute("aria-invalid")).toBe("true");
+      expect(described(thumb)).toContain("Aralık en az 10 olmalı");
+    }
+    const rating = screen.getByRole("group", { name: "Puanınız" });
+    expect(rating.getAttribute("aria-invalid")).toBe("true");
+    expect(described(rating)).toContain("Puan verin");
+    const tags = screen.getByRole("textbox", { name: "Etiketler" });
+    expect(tags.getAttribute("aria-invalid")).toBe("true");
+    expect(described(tags)).toContain("En az bir etiket");
+  });
+
+  test("should make composites read-only from the form", () => {
+    renderForm({
+      schema,
+      defaultValues: { ...defaults, tags: ["acil"] },
+      isReadOnly: true,
+      children: fields,
+    });
+    const quantity = screen.getByRole("spinbutton", { name: "Adet" });
+    expect(quantity.hasAttribute("disabled")).toBe(false);
+    expect(quantity.getAttribute("aria-readonly")).toBe("true");
+    for (const thumb of screen.getAllByRole("slider")) {
+      expect(thumb.hasAttribute("disabled")).toBe(false);
+      expect(thumb.getAttribute("aria-readonly")).toBe("true");
+    }
+    expect(screen.getByLabelText("Bitiş").hasAttribute("readonly")).toBe(true);
+    const tags = screen.getByRole("textbox", { name: "Etiketler" });
+    expect(tags.hasAttribute("readonly")).toBe(true);
+    expect(screen.queryByRole("button", { name: /acil/ })).toBeNull();
   });
 
   test("should disable composites from the form", () => {

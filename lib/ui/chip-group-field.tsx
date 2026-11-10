@@ -4,16 +4,16 @@ import ChipGroup from "@handijit/ui/chip-group";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 export type ChipGroupFieldProps<
   TValues = FieldValues,
   P extends FieldPath<TValues> = FieldPath<TValues>,
-> = FramedBinderProps<TValues, P> &
+> = NamedBinderProps<TValues, P> &
   Pick<
     ComponentProps<typeof ChipGroup<string>>,
-    "options" | "size" | "isScrollable"
+    "options" | "size" | "isScrollable" | "isDisabled" | "isReadOnly"
   > & {
     /** Several chips at once: the value is a `string[]` instead of `string | null`. */
     isMultiple?: boolean;
@@ -34,6 +34,8 @@ const ChipGroupField = <
   isLabelHidden,
   className,
   isMultiple = false,
+  isDisabled,
+  isReadOnly,
   ...groupProps
 }: ChipGroupFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -43,6 +45,10 @@ const ChipGroupField = <
   const { field } = bound;
   const setValue = (value: string | string[] | null): void =>
     field.setValue(value);
+  const state = {
+    isDisabled: isDisabled ?? bound.isDisabled,
+    isReadOnly: isReadOnly ?? bound.isReadOnly,
+  };
   return (
     <FieldFrame
       bound={bound}
@@ -51,10 +57,12 @@ const ChipGroupField = <
       {...{ hint, isRequired, requiredLabel, isLabelHidden, className }}
     >
       {(a11y) => (
-        <FieldGroup a11y={a11y} onLeave={field.onBlur}>
+        <FieldGroup onLeave={field.onBlur}>
           {isMultiple ? (
             <ChipGroup
               {...groupProps}
+              {...a11y}
+              {...state}
               label={label}
               isMultiple
               value={
@@ -65,6 +73,8 @@ const ChipGroupField = <
           ) : (
             <ChipGroup
               {...groupProps}
+              {...a11y}
+              {...state}
               label={label}
               value={typeof field.value === "string" ? field.value : null}
               onChange={setValue}

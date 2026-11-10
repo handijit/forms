@@ -4,7 +4,7 @@ import TagInput from "@handijit/ui/tag-input";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 type TagsPath<TValues> = FieldPathByValue<
@@ -15,9 +15,10 @@ type TagsPath<TValues> = FieldPathByValue<
 export type TagInputFieldProps<
   TValues = FieldValues,
   P extends TagsPath<TValues> = TagsPath<TValues>,
-> = FramedBinderProps<TValues, P> &
+> = NamedBinderProps<TValues, P> &
   Omit<
     ComponentProps<typeof TagInput>,
+    | "value"
     | "values"
     | "onChange"
     | "label"
@@ -43,6 +44,7 @@ const TagInputField = <
   isLabelHidden,
   className,
   isDisabled,
+  isReadOnly,
   ...tagProps
 }: TagInputFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -58,14 +60,15 @@ const TagInputField = <
       {...{ hint, isRequired, requiredLabel, isLabelHidden, className }}
     >
       {(a11y) => (
-        <FieldGroup a11y={{ id: `${a11y.id}-group` }} onLeave={field.onBlur}>
+        <FieldGroup onLeave={field.onBlur}>
           <TagInput
             {...tagProps}
             {...a11y}
             label={label}
-            values={Array.isArray(field.value) ? (field.value as string[]) : []}
+            value={Array.isArray(field.value) ? (field.value as string[]) : []}
             onChange={(values) => field.setValue(values)}
-            isDisabled={isDisabled ?? (bound.isDisabled || bound.isReadOnly)}
+            isDisabled={isDisabled ?? bound.isDisabled}
+            isReadOnly={isReadOnly ?? bound.isReadOnly}
           />
         </FieldGroup>
       )}

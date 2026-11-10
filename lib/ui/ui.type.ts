@@ -6,9 +6,9 @@ import type {
   FormApi,
 } from "@handijit/forms";
 
-import type { FieldFrameProps } from "./field-frame";
+import type { FieldFrameProps, NamedFieldFrameProps } from "./field-frame";
 
-export type { FieldFrameProps };
+export type { FieldFrameProps, NamedFieldFrameProps };
 
 /**
  * What every binder takes. `name` is checked against the form's values when the form's type is
@@ -30,3 +30,9 @@ export type FramedBinderProps<
   TValues = FieldValues,
   P extends FieldPath<TValues> = FieldPath<TValues>,
 > = BinderProps<TValues, P> & FieldFrameProps;
+
+/** Binder props plus ui's `Field` frame, for a control named by the label text. */
+export type NamedBinderProps<
+  TValues = FieldValues,
+  P extends FieldPath<TValues> = FieldPath<TValues>,
+> = BinderProps<TValues, P> & NamedFieldFrameProps;

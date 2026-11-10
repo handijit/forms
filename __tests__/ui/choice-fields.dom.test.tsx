@@ -209,16 +209,27 @@ describe("the choice binders", () => {
     expect(form().getState().touched.plan).toBe(true);
   });
 
-  test("should disable the choices from the form", () => {
+  test("should make the choices read-only from the form", () => {
     renderForm({
       schema,
-      defaultValues: defaults,
+      defaultValues: { ...defaults, city: "ist", size: "s" },
       isReadOnly: true,
       children: fields,
     });
-    expect(
-      screen.getByRole("combobox", { name: /Şehir/ }).hasAttribute("disabled")
-    ).toBe(true);
+    // ui 2.2: a read-only select, combobox, segmented control and chip group stay focusable.
+    for (const name of [/Şehir/, /İlçe/]) {
+      const trigger = screen.getByRole("combobox", { name });
+      expect(trigger.hasAttribute("disabled")).toBe(false);
+      expect(trigger.getAttribute("aria-readonly")).toBe("true");
+    }
+    for (const name of ["Görünüm", "Beden"]) {
+      const group = screen.getByRole("radiogroup", { name });
+      expect(group.getAttribute("aria-readonly")).toBe("true");
+      for (const radio of within(group).getAllByRole("radio")) {
+        expect(radio.hasAttribute("disabled")).toBe(false);
+      }
+    }
+    // ui has no read-only checkbox or radio: those are disabled.
     expect(
       screen
         .getByRole("checkbox", { name: "Koşulları kabul ediyorum" })
@@ -227,5 +238,64 @@ describe("the choice binders", () => {
     expect(
       screen.getByRole("radio", { name: "Pro 3" }).hasAttribute("disabled")
     ).toBe(true);
+  });
+
+  test("should disable every choice from the form, segments and chips included", () => {
+    renderForm({
+      schema,
+      defaultValues: defaults,
+      isDisabled: true,
+      children: fields,
+    });
+    expect(
+      screen.getByRole("combobox", { name: /Şehir/ }).hasAttribute("disabled")
+    ).toBe(true);
+    for (const name of ["Liste", "Izgara", "S", "M"]) {
+      expect(screen.getByRole("radio", { name }).hasAttribute("disabled")).toBe(
+        true
+      );
+    }
+    expect(
+      screen.getByRole("button", { name: "Kırmızı" }).hasAttribute("disabled")
+    ).toBe(true);
+  });
+
+  test("should mark a select touched when focus leaves it, not when a choice is made", async () => {
+    const user = userEvent.setup();
+    const { form } = renderForm({
+      schema,
+      defaultValues: defaults,
+      children: fields,
+    });
+    const city = screen.getByRole("combobox", { name: /Şehir/ });
+    await user.click(city);
+    await user.click(screen.getByRole("option", { name: "Ankara" }));
+    expect(form().getValue("city")).toBe("ank");
+    expect(form().getState().touched.city).toBeUndefined();
+    expect(document.activeElement).toBe(city);
+    await user.tab();
+    expect(form().getState().touched.city).toBe(true);
+  });
+
+  test("should link the errors of the segmented control and the chip group", async () => {
+    const user = userEvent.setup();
+    renderForm({
+      schema: schema.extend({
+        view: z.enum(["list", "grid"], { error: "Görünüm seçin" }),
+      }),
+      defaultValues: { ...defaults, view: undefined } as unknown as Values,
+      children: fields,
+    });
+    await user.click(screen.getByRole("button", { name: "Gönder" }));
+    await nextFrame();
+    const view = screen.getByRole("radiogroup", { name: "Görünüm" });
+    expect(view.getAttribute("aria-invalid")).toBe("true");
+    expect(
+      document.getElementById(
+        view.getAttribute("aria-describedby")?.split(" ")[0] ?? ""
+      )?.textContent
+    ).toContain("Görünüm seçin");
+    const size = screen.getByRole("radiogroup", { name: "Beden" });
+    expect(size.getAttribute("aria-invalid")).toBe("true");
   });
 });

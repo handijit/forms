@@ -8,7 +8,8 @@ import type { FieldPathByValue, FieldValues } from "@handijit/forms";
 import type Checkbox from "@handijit/ui/checkbox";
 import type Switch from "@handijit/ui/switch";
 
-import FieldFrame from "./field-frame";
+import FieldTarget from "./field-target";
+import summaryLabelOf from "./summary-label";
 import type { BinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
@@ -37,6 +38,7 @@ export type ToggleFieldProps<
     | "onChange"
     | "onBlur"
     | "label"
+    | "error"
     | "required"
     | "aria-invalid"
     | "aria-describedby"
@@ -47,7 +49,7 @@ export type ToggleFieldProps<
     summaryLabel?: string;
     /** Marks the control required; derived from the schema (`z.literal(true)`) when left out. */
     isRequired?: boolean;
-    /** On ui's `Field` wrapper. */
+    /** On the control's root (its `<label>`). */
     className?: string;
   };
 
@@ -56,8 +58,8 @@ type Props = ToggleFieldProps<FieldValues, string, typeof Checkbox> & {
 };
 
 /**
- * A checkbox or a switch: the control keeps its own label and hint; ui's `Field` (with an empty,
- * hidden label of its own) renders the error and links it.
+ * A checkbox or a switch: the control draws its own label, hint and error (ui 2.2), linked with
+ * `aria-describedby` and marked with `aria-invalid`.
  */
 const ToggleField = ({
   control: Control,
@@ -66,54 +68,33 @@ const ToggleField = ({
   validate,
   label,
   summaryLabel,
-  hint,
   isRequired,
-  className,
   disabled,
   ...controlProps
 }: Props): ReactElement => {
-  const textLabel =
-    summaryLabel ?? (typeof label === "string" ? label : undefined);
   const bound = useBoundField(form as never, name, {
-    label: textLabel,
+    label: summaryLabelOf(label, summaryLabel),
     validate: validate as never,
   });
   const { field } = bound;
+  const props: ToggleControlProps = {
+    ...controlProps,
+    id: field.id,
+    name,
+    label,
+    ...(field.error === undefined ? {} : { error: field.error }),
+    checked: field.value === true,
+    onChange: (event: ChangeEvent<HTMLInputElement>) =>
+      field.setValue(event.target.checked),
+    onBlur: field.onBlur,
+    // ui has no read-only checkbox: a read-only form shows it disabled.
+    disabled: disabled ?? (bound.isDisabled || bound.isReadOnly),
+    required: isRequired ?? field.isRequired,
+  };
   return (
-    <FieldFrame
-      bound={bound}
-      name={name}
-      label=""
-      isLabelHidden
-      isRequired={false}
-      isHintInControl
-      {...(className === undefined ? {} : { className })}
-    >
-      {(a11y) => {
-        const describedBy = [
-          a11y["aria-describedby"],
-          hint === undefined ? undefined : `${a11y.id}-hint`,
-        ]
-          .filter(Boolean)
-          .join(" ");
-        const props: ToggleControlProps = {
-          ...controlProps,
-          id: a11y.id,
-          name,
-          label,
-          ...(hint === undefined ? {} : { hint }),
-          checked: field.value === true,
-          onChange: (event: ChangeEvent<HTMLInputElement>) =>
-            field.setValue(event.target.checked),
-          onBlur: field.onBlur,
-          disabled: disabled ?? (bound.isDisabled || bound.isReadOnly),
-          required: isRequired ?? field.isRequired,
-          "aria-invalid": a11y["aria-invalid"],
-          "aria-describedby": describedBy === "" ? undefined : describedBy,
-        };
-        return <Control {...props} />;
-      }}
-    </FieldFrame>
+    <FieldTarget form={bound.form} name={name} id={field.id}>
+      <Control {...props} />
+    </FieldTarget>
   );
 };
 

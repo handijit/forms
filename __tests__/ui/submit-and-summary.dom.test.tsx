@@ -6,7 +6,12 @@ import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 
 import { useForm } from "../../lib/index";
-import { ErrorSummary, SubmitButton, TextField } from "../../lib/ui";
+import {
+  CheckboxField,
+  ErrorSummary,
+  SubmitButton,
+  TextField,
+} from "../../lib/ui";
 import { expectNoAxeViolations } from "../support/axe";
 import { nextFrame } from "../support/next-frame";
 import { LABELS, renderForm } from "../support/render-form";
@@ -44,6 +49,50 @@ describe("SubmitButton and ErrorSummary", () => {
     expect(screen.getByText("Lütfen işaretli alanları düzeltin.")).toBeTruthy();
     await user.click(link);
     expect(document.activeElement).toBe(screen.getByLabelText(/^Ad/));
+    await expectNoAxeViolations(container);
+  });
+
+  test("should take a rich label, list it by its summary label and link a checkbox by its own error", async () => {
+    const user = userEvent.setup();
+    const { container } = renderForm({
+      schema: schema.extend({
+        terms: z.literal(true, { error: "Onaylayın" }),
+      }),
+      defaultValues: { ...defaults, terms: false as unknown as true },
+      children: (
+        <>
+          <ErrorSummary />
+          <TextField
+            name="email"
+            label={
+              <>
+                E-posta <abbr title="İş adresi">(iş)</abbr>
+              </>
+            }
+            summaryLabel="E-posta"
+          />
+          <TextField name="name" label="Ad" />
+          <CheckboxField name="terms" label="Koşullar" hint="Okuyun" />
+          <SubmitButton>Kaydet</SubmitButton>
+        </>
+      ),
+    });
+    await user.click(screen.getByRole("button", { name: "Kaydet" }));
+    await nextFrame();
+    expect(
+      screen.getByRole("link", { name: /^E-posta: / }).getAttribute("href")
+    ).toBe(`#${screen.getByLabelText(/^E-posta/).id}`);
+    const terms = screen.getByRole("checkbox", { name: "Koşullar" });
+    const link = screen.getByRole("link", { name: "Koşullar: Onaylayın" });
+    expect(link.getAttribute("href")).toBe(`#${terms.id}`);
+    expect(terms.getAttribute("aria-invalid")).toBe("true");
+    expect(
+      (terms.getAttribute("aria-describedby") ?? "")
+        .split(" ")
+        .map((id) => document.getElementById(id)?.textContent)
+    ).toEqual(["Onaylayın", "Okuyun"]);
+    await user.click(link);
+    expect(document.activeElement).toBe(terms);
     await expectNoAxeViolations(container);
   });
 

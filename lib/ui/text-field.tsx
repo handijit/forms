@@ -10,6 +10,7 @@ import Input from "@handijit/ui/input";
 
 import FieldFrame from "./field-frame";
 import PLAIN_TEXT from "./plain-text";
+import summaryLabelOf from "./summary-label";
 import type { FramedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
@@ -45,6 +46,7 @@ const TextField = <
   form,
   validate,
   label,
+  summaryLabel,
   hint,
   isRequired,
   requiredLabel,
@@ -56,7 +58,7 @@ const TextField = <
   ...inputProps
 }: TextFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
-    label,
+    label: summaryLabelOf(label, summaryLabel),
     validate: validate as never,
   });
   const text = useFieldFormat(

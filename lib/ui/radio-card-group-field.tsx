@@ -4,7 +4,7 @@ import RadioCard from "@handijit/ui/radio-card";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 export type RadioCardOption = {
@@ -17,7 +17,7 @@ export type RadioCardOption = {
 export type RadioCardGroupFieldProps<
   TValues = FieldValues,
   P extends FieldPath<TValues> = FieldPath<TValues>,
-> = FramedBinderProps<TValues, P> & {
+> = NamedBinderProps<TValues, P> & {
   options: readonly RadioCardOption[];
   isDisabled?: boolean;
   /** On the group element, for the layout of the cards. */

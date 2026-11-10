@@ -4,16 +4,16 @@ import type { FieldChildProps } from "@handijit/ui/field";
 import hasLeft from "./has-left";
 
 type Props = {
-  /** The links ui's `Field` made; the wrapper takes the id the field label points at. */
-  a11y: FieldChildProps;
   onLeave: () => void;
   children: ReactNode;
   /**
-   * For controls without group semantics of their own: the wrapper becomes the named group and
-   * carries the invalid state and the error link. Without it the wrapper is a plain element.
+   * `radiogroup`: the wrapper IS the control (ui has no radio group component), so it takes the
+   * links of ui's `Field` (`a11y`): the id, the invalid state, the error and hint, required.
+   * `group`: only a name for a control made of several named parts (a date range).
    */
   role?: "radiogroup" | "group";
   label?: string;
+  a11y?: FieldChildProps;
   className?: string;
 };
 
@@ -22,28 +22,31 @@ type Props = {
  * left when focus moves out of the whole group, not between its parts.
  */
 const FieldGroup = ({
-  a11y,
   onLeave,
   children,
   role,
   label,
+  a11y,
   className,
 }: Props): ReactElement => {
   const onBlur = (event: FocusEvent<HTMLDivElement>): void => {
     if (hasLeft(event)) onLeave();
   };
   const semantics =
-    role === undefined
-      ? {}
-      : {
+    role === "radiogroup" && a11y !== undefined
+      ? {
+          id: a11y.id,
           role,
           "aria-label": label,
           "aria-invalid": a11y["aria-invalid"],
           "aria-describedby": a11y["aria-describedby"],
-          ...(role === "radiogroup" ? { "aria-required": a11y.required } : {}),
-        };
+          "aria-required": a11y.required,
+        }
+      : role === "group"
+        ? { role, "aria-label": label }
+        : {};
   return (
-    <div id={a11y.id} className={className} {...semantics} onBlur={onBlur}>
+    <div className={className} {...semantics} onBlur={onBlur}>
       {children}
     </div>
   );

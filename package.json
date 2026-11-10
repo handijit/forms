@@ -107,7 +107,7 @@
   "private": false,
   "peerDependencies": {
     "@handijit/tr": "^1.0.0",
-    "@handijit/ui": "^2.0.0",
+    "@handijit/ui": "^2.2.0",
     "react": ">=18",
     "zod": "^4.0.0"
   },
@@ -122,9 +122,9 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^10.0.1",
-    "@handijit/design": "^1.0.0",
+    "@handijit/design": "^1.1.0",
     "@handijit/tr": "^1.0.0",
-    "@handijit/ui": "^2.0.0",
+    "@handijit/ui": "^2.2.0",
     "@handijit/utils": "^2.0.0",
     "@playwright/test": "^1.62.1",
     "@rollup/plugin-typescript": "^12.3.1",

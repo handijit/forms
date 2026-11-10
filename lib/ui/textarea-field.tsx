@@ -8,6 +8,7 @@ import Textarea from "@handijit/ui/textarea";
 
 import FieldFrame from "./field-frame";
 import PLAIN_TEXT from "./plain-text";
+import summaryLabelOf from "./summary-label";
 import type { FramedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
@@ -38,6 +39,7 @@ const TextareaField = <
   form,
   validate,
   label,
+  summaryLabel,
   hint,
   isRequired,
   requiredLabel,
@@ -48,7 +50,7 @@ const TextareaField = <
   ...textareaProps
 }: TextareaFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
-    label,
+    label: summaryLabelOf(label, summaryLabel),
     validate: validate as never,
   });
   const text = useFieldFormat(bound.field, PLAIN_TEXT);

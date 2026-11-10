@@ -4,16 +4,16 @@ import SegmentedControl from "@handijit/ui/segmented-control";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 export type SegmentedFieldProps<
   TValues = FieldValues,
   P extends FieldPath<TValues> = FieldPath<TValues>,
-> = FramedBinderProps<TValues, P> &
+> = NamedBinderProps<TValues, P> &
   Pick<
     ComponentProps<typeof SegmentedControl<string>>,
-    "options" | "isIconOnly" | "size" | "testId"
+    "options" | "isIconOnly" | "size" | "isDisabled" | "isReadOnly" | "testId"
   >;
 
 /** ui's `SegmentedControl` in a `Field`, bound to a form field. */
@@ -30,6 +30,8 @@ const SegmentedField = <
   requiredLabel,
   isLabelHidden,
   className,
+  isDisabled,
+  isReadOnly,
   ...controlProps
 }: SegmentedFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -45,12 +47,15 @@ const SegmentedField = <
       {...{ hint, isRequired, requiredLabel, isLabelHidden, className }}
     >
       {(a11y) => (
-        <FieldGroup a11y={a11y} onLeave={field.onBlur}>
+        <FieldGroup onLeave={field.onBlur}>
           <SegmentedControl
             {...controlProps}
+            {...a11y}
             label={label}
             value={typeof field.value === "string" ? field.value : ""}
             onChange={(value) => field.setValue(value)}
+            isDisabled={isDisabled ?? bound.isDisabled}
+            isReadOnly={isReadOnly ?? bound.isReadOnly}
           />
         </FieldGroup>
       )}

@@ -4,7 +4,7 @@ import RangeSlider from "@handijit/ui/range-slider";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 type RangePath<TValues> = FieldPathByValue<
@@ -15,10 +15,17 @@ type RangePath<TValues> = FieldPathByValue<
 export type RangeSliderFieldProps<
   TValues = FieldValues,
   P extends RangePath<TValues> = RangePath<TValues>,
-> = FramedBinderProps<TValues, P> &
+> = NamedBinderProps<TValues, P> &
   Omit<
     ComponentProps<typeof RangeSlider>,
-    "value" | "onChange" | "label" | "className"
+    | "value"
+    | "onChange"
+    | "label"
+    | "className"
+    | "id"
+    | "required"
+    | "aria-invalid"
+    | "aria-describedby"
   >;
 
 /** ui's `RangeSlider` in a `Field`, bound to a `[low, high]` field. */
@@ -36,6 +43,7 @@ const RangeSliderField = <
   isLabelHidden,
   className,
   isDisabled,
+  isReadOnly,
   ...sliderProps
 }: RangeSliderFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -56,13 +64,15 @@ const RangeSliderField = <
       {...{ hint, isRequired, requiredLabel, isLabelHidden, className }}
     >
       {(a11y) => (
-        <FieldGroup a11y={a11y} onLeave={field.onBlur}>
+        <FieldGroup onLeave={field.onBlur}>
           <RangeSlider
             {...sliderProps}
+            {...a11y}
             label={label}
             value={[low, high]}
             onChange={(value) => field.setValue(value)}
-            isDisabled={isDisabled ?? (bound.isDisabled || bound.isReadOnly)}
+            isDisabled={isDisabled ?? bound.isDisabled}
+            isReadOnly={isReadOnly ?? bound.isReadOnly}
           />
         </FieldGroup>
       )}

@@ -3,6 +3,7 @@ import type { FieldPath, FieldValues } from "@handijit/forms";
 import Combobox from "@handijit/ui/combobox";
 
 import FieldFrame from "./field-frame";
+import summaryLabelOf from "./summary-label";
 import type { FramedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
@@ -22,12 +23,13 @@ export type ComboboxFieldProps<
     | "isSearchHidden"
     | "icon"
     | "isDisabled"
+    | "isReadOnly"
     | "testId"
   >;
 
 /**
- * ui's `Combobox` in a `Field`, bound to a form field. Clearing writes `null`. `Combobox` has
- * no blur event: choosing marks the field touched.
+ * ui's `Combobox` in a `Field`, bound to a form field. Clearing writes `null`. Leaving the
+ * combobox (not moving into its search box or list) is the field's blur.
  */
 const ComboboxField = <
   TValues = FieldValues,
@@ -37,16 +39,18 @@ const ComboboxField = <
   form,
   validate,
   label,
+  summaryLabel,
   hint,
   isRequired,
   requiredLabel,
   isLabelHidden,
   className,
   isDisabled,
+  isReadOnly,
   ...comboboxProps
 }: ComboboxFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
-    label,
+    label: summaryLabelOf(label, summaryLabel),
     validate: validate as never,
   });
   const { field } = bound;
@@ -62,11 +66,10 @@ const ComboboxField = <
           {...comboboxProps}
           {...a11y}
           value={typeof field.value === "string" ? field.value : null}
-          onChange={(value) => {
-            field.setValue(value);
-            field.onBlur();
-          }}
-          isDisabled={isDisabled ?? (bound.isDisabled || bound.isReadOnly)}
+          onChange={(value) => field.setValue(value)}
+          onBlur={field.onBlur}
+          isDisabled={isDisabled ?? bound.isDisabled}
+          isReadOnly={isReadOnly ?? bound.isReadOnly}
         />
       )}
     </FieldFrame>

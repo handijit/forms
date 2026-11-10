@@ -4,7 +4,7 @@ import { DateRange } from "@handijit/ui/date-field";
 
 import FieldFrame from "./field-frame";
 import FieldGroup from "./field-group";
-import type { FramedBinderProps } from "./ui.type";
+import type { NamedBinderProps } from "./ui.type";
 import useBoundField from "./use-bound-field";
 
 type DateRangeValue = { start: string; end: string };
@@ -17,8 +17,17 @@ type RangePath<TValues> = FieldPathByValue<
 export type DateRangeFieldProps<
   TValues = FieldValues,
   P extends RangePath<TValues> = RangePath<TValues>,
-> = FramedBinderProps<TValues, P> &
-  Omit<ComponentProps<typeof DateRange>, "value" | "onChange" | "className">;
+> = NamedBinderProps<TValues, P> &
+  Omit<
+    ComponentProps<typeof DateRange>,
+    | "value"
+    | "onChange"
+    | "className"
+    | "id"
+    | "required"
+    | "aria-invalid"
+    | "aria-describedby"
+  >;
 
 const EMPTY_RANGE: DateRangeValue = { start: "", end: "" };
 
@@ -40,6 +49,7 @@ const DateRangeField = <
   isLabelHidden,
   className,
   isDisabled,
+  isReadOnly,
   ...rangeProps
 }: DateRangeFieldProps<TValues, P>): ReactElement => {
   const bound = useBoundField(form as never, name, {
@@ -56,17 +66,14 @@ const DateRangeField = <
       {...{ hint, isRequired, requiredLabel, isLabelHidden, className }}
     >
       {(a11y) => (
-        <FieldGroup
-          a11y={a11y}
-          role="group"
-          label={label}
-          onLeave={field.onBlur}
-        >
+        <FieldGroup role="group" label={label} onLeave={field.onBlur}>
           <DateRange
             {...rangeProps}
+            {...a11y}
             value={value}
             onChange={(next) => field.setValue(next)}
-            isDisabled={isDisabled ?? (bound.isDisabled || bound.isReadOnly)}
+            isDisabled={isDisabled ?? bound.isDisabled}
+            isReadOnly={isReadOnly ?? bound.isReadOnly}
           />
         </FieldGroup>
       )}
