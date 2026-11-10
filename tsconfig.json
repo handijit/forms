@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    // The renderer of an Electron 43 program and the evergreen browsers of the site and the
+    // panel: nothing to downlevel past ES2022.
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    // No ambient Node types in the library: it runs in a page.
+    "types": [],
+    // The ui and tr entries import the core entry by its package name, so the built files share
+    // one copy of it (one React context, one store type) instead of bundling their own.
+    "paths": { "@handijit/forms": ["./lib/index.ts"] },
+    "noEmit": false,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
+
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["lib"],
+  "exclude": ["node_modules", "__tests__", "build"]
+}

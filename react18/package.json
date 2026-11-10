@@ -1,0 +1,10 @@
+{
+  "name": "@handijit/forms-react18",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Holds React 18 next to the React 19 of the root, for the second half of the test matrix. Never published.",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
