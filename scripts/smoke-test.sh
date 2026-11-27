@@ -1,12 +1,10 @@
 #!/bin/sh
 # Installs the packed tarball into an empty project, as a consumer would, and loads every entry
 # by its published name as an ES module and as CommonJS, then renders a form on the server.
-# Network access is needed for the peers. TR_SPEC overrides where @handijitcom/tr comes from
-# (a local path while it is unpublished).
+# Network access is needed for the peers.
 set -e
 
 ROOT="$(pwd)"
-TR_SPEC="${TR_SPEC:-@handijitcom/tr@^1.0.0}"
 
 rm -f handijitcom-forms-*.tgz
 npm pack --silent >/dev/null
@@ -18,7 +16,7 @@ cd "$WORK"
 npm init -y >/dev/null
 npm install --ignore-scripts --no-audit --no-fund --silent \
   "$TARBALL" react@^19 react-dom@^19 zod@^4 @handijitcom/ui@^3 \
-  @handijitcom/utils@^1 react-bootstrap-icons@^1.11 "$TR_SPEC"
+  @handijitcom/utils@^1 react-bootstrap-icons@^1.11 @handijitcom/tr@^1
 
 cat > esm.mjs <<'JS'
 import { createElement as h } from "react";

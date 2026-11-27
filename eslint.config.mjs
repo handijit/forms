@@ -1,8 +1,4 @@
-import js from "@eslint/js";
-import { defineConfig, globalIgnores } from "eslint/config";
-import prettier from "eslint-config-prettier/flat";
-import reactHooks from "eslint-plugin-react-hooks";
-import tseslint from "typescript-eslint";
+import { library } from "@handijitcom/config/eslint";
 
 // Section 21 layering: each entry imports its own folder and reaches another entry only by the
 // package's published name, so the built entries share one copy of the core.
@@ -15,26 +11,23 @@ const CORE_FILES = [
   "lib/types/**",
 ];
 
-export default defineConfig([
-  globalIgnores(["build/**", "coverage/**", "react18/node_modules/**"]),
+// The hooks live in plain .ts files as well as .tsx, and the tests render them.
+const REACT_FILES = ["lib/**/*.{ts,tsx}", "__tests__/**/*.{ts,tsx}"];
+
+export default [
+  ...library({
+    rootDir: import.meta.dirname,
+    react: REACT_FILES,
+    ignores: ["react18/node_modules/**"],
+  }),
   {
-    files: ["**/*.ts", "**/*.tsx", "**/*.mts"],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat["recommended-latest"],
-    ],
+    // Stricter than the preset's React Hooks set: a missing dependency is an error in the editor
+    // too, and void useMemo callbacks are refused.
+    files: REACT_FILES,
     rules: {
-      "@typescript-eslint/consistent-type-imports": "error",
-      "@typescript-eslint/no-explicit-any": "error",
       "react-hooks/exhaustive-deps": "error",
-      "no-console": "error",
+      "react-hooks/void-use-memo": "error",
     },
-  },
-  {
-    // The public contract must not be a side effect of type inference.
-    files: ["lib/**/*.ts", "lib/**/*.tsx"],
-    rules: { "@typescript-eslint/explicit-module-boundary-types": "error" },
   },
   {
     files: CORE_FILES,
@@ -119,5 +112,4 @@ export default defineConfig([
       "react-hooks/static-components": "off",
     },
   },
-  prettier,
-]);
+];

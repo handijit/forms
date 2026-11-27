@@ -536,6 +536,12 @@ npm run verify       # lint + Prettier, typecheck, tests with coverage, build, b
 npm run test:smoke   # installs the packed tarball in a temporary project (needs the network)
 ```
 
+The ESLint, Prettier, TypeScript and Vitest settings come from
+[`@handijitcom/config`](https://github.com/handijit/config)'s library presets; `eslint.config.mjs`
+adds the entry layering and the React Hooks overrides, `vitest.config.mts` the React 18 project
+and the DOM setup file. CI runs the gate and the smoke test on Node 24 (the engines floor) and 26
+(the Active LTS).
+
 The tests run in three Vitest projects: Node, and jsdom on React 19 and on React 18 (installed
 in the private `react18/` workspace). Coverage must stay at 100%; there is no browser or e2e
 test, the applications that use the package run their own. `scripts/verify-build.mjs` checks
