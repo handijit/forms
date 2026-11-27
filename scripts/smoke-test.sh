@@ -14,7 +14,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"; rm -f "$TARBALL"' EXIT
 cd "$WORK"
 npm init -y >/dev/null
-npm install --ignore-scripts --no-audit --no-fund --silent \
+npm install --ignore-scripts --no-audit --no-fund --loglevel=error \
   "$TARBALL" react@^19 react-dom@^19 zod@^4 @handijitcom/ui@^3 \
   @handijitcom/utils@^1 react-bootstrap-icons@^1.11 @handijitcom/tr@^1
 
