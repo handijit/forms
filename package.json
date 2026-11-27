@@ -1,0 +1,155 @@
+{
+  "name": "@handijitcom/forms",
+  "version": "1.0.0",
+  "description": "Zod-based client forms for React: a typed, headless form store with field-level subscriptions, accessible error handling, binders for the @handijitcom/ui field components and Turkish input formats.",
+  "author": "Ahmet ilhan <ahmetilhan.dev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/handijit/forms.git"
+  },
+  "homepage": "https://github.com/handijit/forms#readme",
+  "bugs": {
+    "url": "https://github.com/handijit/forms/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/index.d.mts",
+        "default": "./build/index.mjs"
+      },
+      "require": {
+        "types": "./build/index.d.ts",
+        "default": "./build/index.cjs"
+      },
+      "default": "./build/index.mjs"
+    },
+    "./ui": {
+      "import": {
+        "types": "./build/ui.d.mts",
+        "default": "./build/ui.mjs"
+      },
+      "require": {
+        "types": "./build/ui.d.ts",
+        "default": "./build/ui.cjs"
+      },
+      "default": "./build/ui.mjs"
+    },
+    "./tr": {
+      "import": {
+        "types": "./build/tr.d.mts",
+        "default": "./build/tr.mjs"
+      },
+      "require": {
+        "types": "./build/tr.d.ts",
+        "default": "./build/tr.cjs"
+      },
+      "default": "./build/tr.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "ui": [
+        "./build/ui.d.ts"
+      ],
+      "tr": [
+        "./build/tr.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "build",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "react18"
+  ],
+  "scripts": {
+    "build": "sh ./scripts/prod-build.sh",
+    "dev": "sh ./scripts/dev-build.sh",
+    "lint": "eslint . --max-warnings 0 && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run --coverage",
+    "size": "node ./scripts/report-size.mjs",
+    "verify:build": "node ./scripts/verify-build.mjs",
+    "lint:package": "publint && attw --pack .",
+    "test:smoke": "sh ./scripts/smoke-test.sh",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run verify:build && npm run size && npm run lint:package",
+    "prepublishOnly": "npm run verify"
+  },
+  "keywords": [
+    "react",
+    "forms",
+    "form",
+    "zod",
+    "validation",
+    "typescript",
+    "accessibility",
+    "a11y",
+    "headless",
+    "field-array",
+    "turkish",
+    "handijit"
+  ],
+  "peerDependencies": {
+    "@handijitcom/tr": "^1.0.0",
+    "@handijitcom/ui": "^3.0.0",
+    "react": ">=18",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@handijitcom/tr": {
+      "optional": true
+    },
+    "@handijitcom/ui": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@eslint/js": "^10.0.1",
+    "@handijitcom/tr": "file:../tr",
+    "@handijitcom/ui": "^3.0.0",
+    "@handijitcom/utils": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.13",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vitest/coverage-v8": "^5.1.0",
+    "axe-core": "^4.14.1",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "jsdom": "^31.0.0",
+    "prettier": "^3.9.10",
+    "publint": "^0.3.25",
+    "react": "^19.3.1",
+    "react-bootstrap-icons": "^1.11.6",
+    "react-dom": "^19.3.1",
+    "rollup": "^4.62.4",
+    "rollup-plugin-dts": "^6.5.1",
+    "tslib": "^2.8.1",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0",
+    "zod": "^4.6.7"
+  }
+}

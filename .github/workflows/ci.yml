@@ -1,0 +1,46 @@
+# Han Dijit standard CI, with the section 14 Node matrix: the engines floor and the Active LTS.
+name: CI
+
+# Pull requests only. A push to master is gated by `publish.yml`, which runs the same commands
+# before anything reaches the registry.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["24", "26"]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      # Dependency lifecycle scripts are an arbitrary-code-execution path during install.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # Lint (with Prettier), typecheck, tests on React 19 and 18 with coverage, build, build
+      # checks, size budgets, publint and attw.
+      - name: Verify
+        run: npm run verify
+
+      # The gate measures the source; this installs the tarball a consumer gets and loads every
+      # entry by its published name, as an ES module and as CommonJS.
+      - name: Smoke test the packed tarball
+        run: npm run test:smoke

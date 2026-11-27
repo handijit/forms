@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    // Node 24 (the engines floor), Electron and every evergreen browser since 2022 run ES2022
+    // natively; nothing to downlevel.
+    "target": "ES2022",
+    "module": "ESNext",
+    // DOM supplies the element, focus and AbortSignal typings the hooks use behind event paths.
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    // An isomorphic library must not lean on Node or test globals.
+    "types": [],
+    "noEmit": false,
+    // The ui and tr entries import the core by its published name; it stays external in the
+    // build, and type checking reads it from source.
+    "paths": {
+      "@handijitcom/forms": ["./lib/index.ts"]
+    },
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
+
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["lib"],
+  "exclude": ["node_modules", "__tests__", "build"]
+}
